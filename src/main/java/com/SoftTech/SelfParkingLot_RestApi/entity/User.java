@@ -3,7 +3,6 @@ package com.SoftTech.SelfParkingLot_RestApi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 
 @Entity
@@ -73,14 +72,14 @@ public class User {
     )
     private String email;
 
-    @OneToMany(targetEntity = Authorization.class, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = Authorization.class, cascade = CascadeType.REMOVE)
     @JoinColumn(name="user_id",referencedColumnName = "id")
     private List<Authorization> authorizations;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "users_parking_lot",
-             joinColumns = @JoinColumn(name = "user_id"),
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "parking_lot_id"),
             uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "parking_lot_id"})
     )

@@ -4,7 +4,6 @@ import com.SoftTech.SelfParkingLot_RestApi.entity.ParkingLot;
 import com.SoftTech.SelfParkingLot_RestApi.repository.ParkingLotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -12,6 +11,7 @@ import java.util.List;
 public class ParkingLotServiveImpl implements ParkingLotService{
 
     private final ParkingLotRepository parkingLotRepository;
+    private final LocationService locationService;
 
 
     @Override
@@ -26,6 +26,11 @@ public class ParkingLotServiveImpl implements ParkingLotService{
 
     @Override
     public ParkingLot save(ParkingLot parkingLot) {
+        if(parkingLot.getLocation().getId()!=null){
+            if(parkingLot.getLocation().getId()!=0){
+                parkingLot.setLocation(locationService.get(parkingLot.getLocation().getId()));
+            }
+        }
         return parkingLotRepository.save(parkingLot);
     }
 
@@ -40,7 +45,7 @@ public class ParkingLotServiveImpl implements ParkingLotService{
     public ParkingLot update(ParkingLot parkingLot, Long id) {
         ParkingLot updatedParkingLot = parkingLotRepository.findById(id).get();
         updatedParkingLot.setName(parkingLot.getName());
-        updatedParkingLot.setLocation(parkingLot.getLocation());
+            updatedParkingLot.setLocation(locationService.get(parkingLot.getLocation().getId()));
         return parkingLotRepository.save(updatedParkingLot);
     }
 }

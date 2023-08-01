@@ -1,7 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.entity;
 
 import jakarta.persistence.*;
-
 import java.io.Serializable;
 
 @Embeddable

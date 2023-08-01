@@ -4,7 +4,6 @@ import com.SoftTech.SelfParkingLot_RestApi.entity.User;
 import com.SoftTech.SelfParkingLot_RestApi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController

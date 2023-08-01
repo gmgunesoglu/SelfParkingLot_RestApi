@@ -1,10 +1,8 @@
 package com.SoftTech.SelfParkingLot_RestApi.controller;
 
 import com.SoftTech.SelfParkingLot_RestApi.entity.Authorization;
-import com.SoftTech.SelfParkingLot_RestApi.entity.AuthorizationId;
 import com.SoftTech.SelfParkingLot_RestApi.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

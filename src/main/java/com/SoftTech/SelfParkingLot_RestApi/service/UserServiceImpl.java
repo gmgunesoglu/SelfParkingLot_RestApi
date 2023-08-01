@@ -2,9 +2,9 @@ package com.SoftTech.SelfParkingLot_RestApi.service;
 
 import com.SoftTech.SelfParkingLot_RestApi.entity.User;
 import com.SoftTech.SelfParkingLot_RestApi.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service

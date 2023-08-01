@@ -1,7 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
 import com.SoftTech.SelfParkingLot_RestApi.entity.User;
-
 import java.util.List;
 
 public interface UserService {

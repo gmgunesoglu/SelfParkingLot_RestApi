@@ -4,7 +4,6 @@ import com.SoftTech.SelfParkingLot_RestApi.entity.Location;
 import com.SoftTech.SelfParkingLot_RestApi.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
