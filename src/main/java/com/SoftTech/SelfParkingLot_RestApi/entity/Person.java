@@ -1,15 +1,22 @@
 package com.SoftTech.SelfParkingLot_RestApi.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchConnectionDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name="person")
 @Data
-@RequiredArgsConstructor
-public class Person {
+public class Person implements UserDetails {
 
     @Id
     @SequenceGenerator(
@@ -29,12 +36,12 @@ public class Person {
     private Long id;
 
     @Column(
-            name="user_name",
+            name="username",
             nullable = false,
             length = 20,
             unique = true
     )
-    private  String userName;
+    private  String username;
 
     @Column(
             name="password",
@@ -60,8 +67,10 @@ public class Person {
     //yetkilendirme
     @Column(
             name = "authority",
-            nullable = false
+            nullable = false,
+            length = 8
     )
+    @Enumerated(EnumType.STRING)
     private Authority authority;
 
     @Column(
@@ -100,8 +109,41 @@ public class Person {
     @JoinColumn(name="person_id",referencedColumnName = "id")
     private List<Vehicle> Vehicles;
 
-    enum Authority{
-        USER,
-        CUSTOMER
+
+    //JWT için metotlar
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(authority.name()));
     }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }

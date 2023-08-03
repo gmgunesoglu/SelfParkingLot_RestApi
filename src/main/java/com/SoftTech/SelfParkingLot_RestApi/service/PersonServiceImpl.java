@@ -36,16 +36,17 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Person update(Person user, Long id) {
-        Person updatedUser = personRepository.findById(id).get();
-        updatedUser.setAuthority(user.getAuthority());
-        updatedUser.setEmail(user.getEmail());
-        updatedUser.setUserName(user.getUserName());
-        updatedUser.setPassword(user.getPassword());
-        updatedUser.setPhoneNumber(user.getPhoneNumber());
-        updatedUser.setFirstName(user.getFirstName());
-        updatedUser.setLastName(user.getLastName());
-//        updatedUser.setParkingLots(user.getParkingLots());
-//        updatedUser.setSharedParkingLots(user.getSharedParkingLots());
-        return personRepository.save(updatedUser);
+        return null;
+//        Person updatedUser = personRepository.findById(id).get();
+//        updatedUser.setAuthority(user.getAuthority());
+//        updatedUser.setEmail(user.getEmail());
+//        updatedUser.setUserName(user.getUserName());
+//        updatedUser.setPassword(user.getPassword());
+//        updatedUser.setPhoneNumber(user.getPhoneNumber());
+//        updatedUser.setFirstName(user.getFirstName());
+//        updatedUser.setLastName(user.getLastName());
+////        updatedUser.setParkingLots(user.getParkingLots());
+////        updatedUser.setSharedParkingLots(user.getSharedParkingLots());
+//        return personRepository.save(updatedUser);
     }
 }
