@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name="parking_lot")
 @Data
@@ -28,16 +30,40 @@ public class ParkingLot {
     private Long id;
 
     @Column(
+            name = "owner_id",
+            nullable = false
+    )
+    private Long ownerId;
+
+    @Column(
             name="name",
             nullable = false,
             length = 40
     )
     private  String name;
 
-    //geçici olarak OneToOne
-    @OneToOne(targetEntity = Location.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "location_id",referencedColumnName = "id",nullable = false)
-    private Location location;
+    @Column(
+            name = "location_id",
+            nullable = false
+    )
+    private Long locationId;
 
+    @Column(
+            name="address",
+            nullable = false,
+            length = 300
+    )
+    private  String address;
 
+    @OneToMany(targetEntity = SharedParkingLot.class)
+    @JoinColumn(name="parking_lot_id",referencedColumnName = "id")
+    private List<SharedParkingLot> sharedParkingLots;    //Owner olduğu + ortaklık
+
+    @OneToMany(targetEntity = ParkingSpot.class)
+    @JoinColumn(name="parking_lot_id",referencedColumnName = "id")
+    private List<ParkingSpot> parkingSpots;
+
+    @OneToMany(targetEntity = PaymentRecipe.class)
+    @JoinColumn(name="parking_lot_id",referencedColumnName = "id")
+    private List<PaymentRecipe> paymentRecipes;
 }

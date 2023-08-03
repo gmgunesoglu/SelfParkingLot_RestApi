@@ -37,7 +37,6 @@ public class LocationServiceImpl implements LocationService{
     @Override
     public Location update(Location location, Long id) {
         Location updatedLocation = locationRepository.findById(id).get();
-        updatedLocation.setAddress(location.getAddress());
         updatedLocation.setTown(location.getTown());
         updatedLocation.setDistrict(location.getDistrict());
         updatedLocation.setCity(location.getCity());

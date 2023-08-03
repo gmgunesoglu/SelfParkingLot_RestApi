@@ -1,11 +1,17 @@
 package com.SoftTech.SelfParkingLot_RestApi.entity;
 
 import jakarta.persistence.*;
+import jdk.dynalink.linker.LinkerServices;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.Mapping;
+
+import java.util.List;
 
 @Entity
-@Table(name="location")
+@Table(name = "location", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"city", "town", "district"})
+})
 @Data
 @RequiredArgsConstructor
 public class Location {
@@ -48,10 +54,8 @@ public class Location {
     )
     private  String district;
 
-    @Column(
-            name="address",
-            nullable = false,
-            length = 200
-    )
-    private  String address;
+    //cascade yok!
+    @OneToMany(targetEntity = ParkingLot.class)
+    @JoinColumn(name="location_id",referencedColumnName = "id")
+    private List<ParkingLot> parkingLots;
 }
