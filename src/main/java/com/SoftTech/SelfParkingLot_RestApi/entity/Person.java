@@ -46,7 +46,7 @@ public class Person implements UserDetails {
     @Column(
             name="password",
             nullable = false,
-            length = 20
+            length = 60
     )
     private  String password;
 

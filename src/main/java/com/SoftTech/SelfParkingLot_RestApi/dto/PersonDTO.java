@@ -11,4 +11,5 @@ public class PersonDTO extends PersonLoginDTO {
     private String lastName;
     private String userName;
     private String phoneNumber;
+    private Authority authority;
 }

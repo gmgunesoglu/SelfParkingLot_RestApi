@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-
 public class JwtService {
 
     private static final String SECRET_KEY = "e34bc93bce34083f4dc6900e986019e7f08cf994c01046348dd69f8f05f00cb9";
@@ -72,5 +71,9 @@ public class JwtService {
 
     private Date extractExpiration(String jwtToken) {
         return extractClaim(jwtToken, Claims::getExpiration);
+    }
+
+    public String getSecretKey(){
+        return SECRET_KEY;
     }
 }
