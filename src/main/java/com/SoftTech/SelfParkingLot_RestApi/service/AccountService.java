@@ -6,13 +6,10 @@ import com.SoftTech.SelfParkingLot_RestApi.dto.PersonLoginDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.List;
+public interface AccountService {
+    Person showPersonInfo(HttpServletRequest request);
 
-public interface PersonService {
+    Person register(PersonDTO dto);
 
-    List<Person> getAll();
-    Person get(Long id);
-    Person save(Person user);
-    Person delete(Long id);
-    Person update(Person user, Long id);
+    JwtToken login(PersonLoginDTO dto);
 }

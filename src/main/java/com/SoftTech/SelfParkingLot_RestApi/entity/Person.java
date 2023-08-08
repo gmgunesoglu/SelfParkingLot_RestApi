@@ -110,7 +110,6 @@ public class Person implements UserDetails {
     private List<Vehicle> Vehicles;
 
 
-    //JWT için metotlar
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(authority.name()));
