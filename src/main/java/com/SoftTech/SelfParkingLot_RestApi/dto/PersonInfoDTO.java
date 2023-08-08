@@ -4,13 +4,12 @@ import com.SoftTech.SelfParkingLot_RestApi.entity.Authority;
 import lombok.Data;
 
 @Data
-public class PersonDTO extends PersonLoginDTO {
+public class PersonInfoDTO {
 
-    //User ve Customer Save ve Update işlemlerinde...
+    private String userName;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
     private Authority authority;
-
 }

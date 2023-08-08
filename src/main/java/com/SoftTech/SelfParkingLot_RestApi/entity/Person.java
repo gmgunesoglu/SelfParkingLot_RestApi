@@ -3,6 +3,11 @@ package com.SoftTech.SelfParkingLot_RestApi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Where;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -39,7 +44,7 @@ public class Person {
     @Column(
             name="password",
             nullable = false,
-            length = 20
+            length = 60
     )
     private  String password;
 
@@ -62,6 +67,7 @@ public class Person {
             name = "authority",
             nullable = false
     )
+    @Enumerated(EnumType.STRING)
     private Authority authority;
 
     @Column(
@@ -96,12 +102,12 @@ public class Person {
     @JoinColumn(name="owner_id",referencedColumnName = "id")
     private List<ParkingLot> parkingLots;     //Owner olduğu
 
-    @OneToMany(targetEntity = Vehicle.class)
+    @OneToMany(targetEntity = Vehicle.class,fetch = FetchType.LAZY)
     @JoinColumn(name="person_id",referencedColumnName = "id")
     private List<Vehicle> Vehicles;
 
-    enum Authority{
-        USER,
-        CUSTOMER
+    public Collection<? extends GrantedAuthority> getAuthhorities(){
+        return List.of(new SimpleGrantedAuthority(authority.name()));
     }
+
 }
