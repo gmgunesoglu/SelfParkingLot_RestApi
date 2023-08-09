@@ -4,11 +4,14 @@ import com.SoftTech.SelfParkingLot_RestApi.dto.JwtToken;
 import com.SoftTech.SelfParkingLot_RestApi.dto.PersonDTO;
 import com.SoftTech.SelfParkingLot_RestApi.dto.PersonLoginDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
+import com.SoftTech.SelfParkingLot_RestApi.security.TokenQueue;
 import com.SoftTech.SelfParkingLot_RestApi.service.AccountService;
-import com.SoftTech.SelfParkingLot_RestApi.service.PersonService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/account")
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     private final AccountService accountService;
+
 
     @GetMapping("/info")    //(user,customer,admin) kendi bilgilerini görebilir dönüş değeri ne? Polimorfizim?
     public Person showPersonInfo(HttpServletRequest request){
@@ -33,10 +37,19 @@ public class AccountController {
     }
 
     @GetMapping("/logout")
-    public String logout(){
-        //logout işleri yazılacak
-
-        return "Çıkış yapıldı.";
+    public String logout(HttpServletRequest request){
+        return accountService.logout(request);
     }
+
+    @GetMapping("/tokens")
+    public HashMap<String, String> getTokens(){
+        return accountService.getTokens();
+    }
+
+    @GetMapping("/queue")
+    public List<String> listQueue(){
+        return accountService.listQueue();
+    }
+
 
 }

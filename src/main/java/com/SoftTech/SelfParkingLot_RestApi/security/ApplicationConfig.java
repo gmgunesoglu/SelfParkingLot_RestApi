@@ -25,7 +25,7 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService(){
 
         return username -> repository.findByUsernameOrEmail(username,username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found: "));
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found: "+username));
     }
 
     @Bean
@@ -40,6 +40,8 @@ public class ApplicationConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

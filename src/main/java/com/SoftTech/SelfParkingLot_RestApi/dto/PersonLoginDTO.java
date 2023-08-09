@@ -6,7 +6,7 @@ import lombok.Data;
 public class PersonLoginDTO {
 
     //user veya customer login işlemi için
-    private String email;
+    private String usernameOrEmail;
     private String password;
 
 }
