@@ -1,8 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
-import com.SoftTech.SelfParkingLot_RestApi.dto.JwtToken;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonLoginDTO;
+import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.repository.PersonRepository;
 import com.SoftTech.SelfParkingLot_RestApi.security.JWTAuthenticationFilter;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +80,36 @@ public class AccountServiceImpl implements AccountService{
         return filter.logout(person.getUsername());
     }
 
+    @Override
+    public String changePassword(PersonChangePasswordDTO dto, HttpServletRequest request) {
+        Person person = getPersonFromRequest(request);
+        if(passwordEncoder.encode(dto.getOldPassword()).matches(person.getPassword())){
+            // şifre doğru, güncelle
+            person.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+            personRepository.save(person);
+            // sistemden çıkış yap
+            filter.logout(person.getUsername());
+            return "Şifreniz güncellendi, yeni şifrenizle giriş yapabilirsiniz.";
+        }else{
+            // şifre yanlış
+            return "Şifre hatalı!";
+        }
+    }
+
+    @Override
+    public Person personUpdate(PersonUpdateDTO dto, HttpServletRequest request) {
+        Person person = personRepository.findByEmail(dto.getEmail()).get();
+        if(person==null){
+            person=getPersonFromRequest(request);
+            person.setEmail(dto.getEmail());
+            person.setFirstName(dto.getFirstName());
+            person.setLastName(dto.getLastName());
+            person.setEmail(dto.getEmail());
+            return personRepository.save(person);
+        }else{
+            throw new UsernameNotFoundException("Email kullanılıyor: "+dto.getEmail());
+        }
+    }
 
     private Person getPersonFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");

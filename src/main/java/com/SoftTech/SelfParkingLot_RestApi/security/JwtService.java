@@ -18,11 +18,16 @@ import java.util.function.Function;
 public class JwtService {
 
     private static final String SECRET_KEY = "e34bc93bce34083f4dc6900e986019e7f08cf994c01046348dd69f8f05f00cb9";
-    private static final int tokenDuration = 30000;//3600000; // 60dk
+    private static final int tokenDuration = 3600000;//3600000; // 60dk
 
     public String extractUsername(String jwtToken){
         return extractClaim(jwtToken,Claims::getSubject);
     }
+
+    public String extractId(String jwtToken){
+        return extractClaim(jwtToken,Claims::getId);
+    }
+
 
     public <T> T extractClaim(String jwtToken, Function<Claims,T> claimResolver){
         final Claims claims = extractAllClaims(jwtToken);

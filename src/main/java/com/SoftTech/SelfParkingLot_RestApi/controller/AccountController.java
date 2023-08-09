@@ -1,8 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.controller;
 
-import com.SoftTech.SelfParkingLot_RestApi.dto.JwtToken;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonLoginDTO;
+import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.security.TokenQueue;
 import com.SoftTech.SelfParkingLot_RestApi.service.AccountService;
@@ -41,11 +39,23 @@ public class AccountController {
         return accountService.logout(request);
     }
 
+    @PutMapping("/changepassword")
+    public String changePassword(@RequestBody PersonChangePasswordDTO dto, HttpServletRequest request){
+        return accountService.changePassword(dto, request);
+    }
+
+    @PutMapping
+    public Person personUpdate(@RequestBody PersonUpdateDTO dto, HttpServletRequest request){
+        return accountService.personUpdate(dto,request);
+    }
+
+    //geçici
     @GetMapping("/tokens")
     public HashMap<String, String> getTokens(){
         return accountService.getTokens();
     }
 
+    //geçici
     @GetMapping("/queue")
     public List<String> listQueue(){
         return accountService.listQueue();

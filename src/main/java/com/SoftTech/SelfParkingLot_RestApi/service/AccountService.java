@@ -1,8 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
-import com.SoftTech.SelfParkingLot_RestApi.dto.JwtToken;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonLoginDTO;
+import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.security.TokenQueue;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,4 +20,8 @@ public interface AccountService {
     List<String> listQueue();
 
     String logout(HttpServletRequest request);
+
+    String changePassword(PersonChangePasswordDTO dto, HttpServletRequest request);
+
+    Person personUpdate(PersonUpdateDTO dto, HttpServletRequest request);
 }
