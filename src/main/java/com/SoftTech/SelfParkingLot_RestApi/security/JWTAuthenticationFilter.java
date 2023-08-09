@@ -80,15 +80,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         currentTokens.add(token, userName);
     }
 
-    public HashMap<String, String> getTokens() {
-        return currentTokens.getTokens();
-    }
-
-    public List<String> listQueue() {
-        return currentTokens.listQueue();
-    }
-
-    public String logout(String username) {
-        return currentTokens.remove(username);
+    public CurrentTokens getCurrentTokens(){
+        return this.currentTokens;
     }
 }

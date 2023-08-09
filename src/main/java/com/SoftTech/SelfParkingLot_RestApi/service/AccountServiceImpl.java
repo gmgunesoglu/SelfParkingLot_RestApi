@@ -3,11 +3,13 @@ package com.SoftTech.SelfParkingLot_RestApi.service;
 import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.repository.PersonRepository;
+import com.SoftTech.SelfParkingLot_RestApi.security.CurrentTokens;
 import com.SoftTech.SelfParkingLot_RestApi.security.JWTAuthenticationFilter;
 import com.SoftTech.SelfParkingLot_RestApi.security.JwtService;
 import com.SoftTech.SelfParkingLot_RestApi.security.TokenQueue;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,15 +21,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService{
 
     private final PersonRepository personRepository;
 
-    private final JWTAuthenticationFilter filter;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    private CurrentTokens currentTokens;
+
+    @Autowired
+    public AccountServiceImpl(PersonRepository personRepository, JWTAuthenticationFilter filter, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+        this.personRepository = personRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        currentTokens=filter.getCurrentTokens();
+    }
+
     @Override
     public Person showPersonInfo(HttpServletRequest request) {
         return getPersonFromRequest(request);
@@ -59,25 +71,25 @@ public class AccountServiceImpl implements AccountService{
         person = personRepository.findByUsernameOrEmail(dto.getUsernameOrEmail(),dto.getUsernameOrEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found: "+dto.getUsernameOrEmail()));
         String token=jwtService.generateToken(person);
-        filter.add(token,person.getUsername());
+        currentTokens.add(token,person.getUsername());
         return new JwtToken(token);
     }
 
     @Override
     public HashMap<String, String> getTokens() {
-        return filter.getTokens();
+        return currentTokens.getTokens();
     }
 
     @Override
     public List<String> listQueue() {
-        return filter.listQueue();
+        return currentTokens.listQueue();
     }
 
     @Override
     public String logout(HttpServletRequest request) {
         Person person = getPersonFromRequest(request);
 
-        return filter.logout(person.getUsername());
+        return currentTokens.remove(person.getUsername());
     }
 
     @Override
@@ -88,7 +100,7 @@ public class AccountServiceImpl implements AccountService{
             person.setPassword(passwordEncoder.encode(dto.getNewPassword()));
             personRepository.save(person);
             // sistemden çıkış yap
-            filter.logout(person.getUsername());
+            currentTokens.remove(person.getUsername());
             return "Şifreniz güncellendi, yeni şifrenizle giriş yapabilirsiniz.";
         }else{
             // şifre yanlış
