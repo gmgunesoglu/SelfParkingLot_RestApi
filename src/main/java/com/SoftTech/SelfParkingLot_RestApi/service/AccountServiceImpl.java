@@ -24,11 +24,9 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService{
 
     private final PersonRepository personRepository;
-
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
     private CurrentTokens currentTokens;
 
     @Autowired
