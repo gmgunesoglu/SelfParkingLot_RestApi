@@ -1,6 +1,9 @@
 package com.SoftTech.SelfParkingLot_RestApi.security;
 
+import com.SoftTech.SelfParkingLot_RestApi.exceptionhandling.GlobalRuntimeException;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.*;
@@ -36,7 +39,8 @@ public class CurrentTokens {
                 multiLogins.remove(userName);
                 hashMap.remove(userName);
                 System.out.println("[!] Kullanıcı blocklandı: "+userName);
-                throw new UsernameNotFoundException("Bad User.");
+                throw new AuthenticationException("Suspicious move. You cannot login for 24 hours.") {
+                };
             }
         }
         addToQueue(token,userName);
@@ -64,14 +68,14 @@ public class CurrentTokens {
             queue.prev=queue;
         }else if(queue.prev==queue){
             //tek token var
-            TokenQueue iter=new TokenQueue(token,userName);
+            TokenQueue iter=new TokenQueue(token,userName,new Date(System.currentTimeMillis()));
             queue.next=iter;
             queue.prev=iter;
             iter.prev=queue;
             iter.next=queue;
         }else{
             //en az 2 token var
-            TokenQueue iter=new TokenQueue(token,userName);
+            TokenQueue iter=new TokenQueue(token,userName,new Date(System.currentTimeMillis()));
             queue.prev.next=iter;
             iter.prev=queue.prev;
             queue.prev=iter;

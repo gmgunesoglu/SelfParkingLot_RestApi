@@ -49,6 +49,11 @@ public class AccountController {
         return accountService.personUpdate(dto,request);
     }
 
+    @DeleteMapping
+    public String disable(@RequestBody PersonLoginDTO dto){
+        return accountService.disable(dto);
+    }
+
     //geçici
     @GetMapping("/tokens")
     public HashMap<String, String> getTokens(){

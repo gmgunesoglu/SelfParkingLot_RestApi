@@ -2,14 +2,17 @@ package com.SoftTech.SelfParkingLot_RestApi.service;
 
 import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
+import com.SoftTech.SelfParkingLot_RestApi.exceptionhandling.GlobalRuntimeException;
 import com.SoftTech.SelfParkingLot_RestApi.repository.PersonRepository;
 import com.SoftTech.SelfParkingLot_RestApi.security.CurrentTokens;
 import com.SoftTech.SelfParkingLot_RestApi.security.JWTAuthenticationFilter;
 import com.SoftTech.SelfParkingLot_RestApi.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -67,7 +70,7 @@ public class AccountServiceImpl implements AccountService{
         person = personRepository.findByUsernameOrEmail(dto.getUsernameOrEmail(),dto.getUsernameOrEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found: "+dto.getUsernameOrEmail()));
         if(!person.isEnable()){
-            throw new UsernameNotFoundException("Kullanıcı silinmiş!");
+            throw new GlobalRuntimeException("This user is removed.", HttpStatus.NOT_FOUND);
         }
         if(person.getBlockTime()!=null){
             //blocklanmış ise...
@@ -80,13 +83,13 @@ public class AccountServiceImpl implements AccountService{
                 // Hatta broda ip blocklamak gerekir. Tüm bu işlemler kötü niyetli kullanıcılara karşı sunucuyu savunma cabaları.
                 // ama kesin bir koruma yok, sadece yavaşlatma var. İp blocklama ile sunucu performansı çok iyi bir sekilde korunabilir
 
-                throw new UsernameNotFoundException("Sen çok kötüsün!");
+                throw new GlobalRuntimeException("This user is blocked for 24 Hours: "+person.getUsername(), HttpStatus.NOT_FOUND);
             }
         }
         String token=jwtService.generateToken(person);
         try{
             currentTokens.addToCache(token,person.getUsername());
-        }catch (UsernameNotFoundException ex){
+        }catch (AuthenticationException ex){
             person.setBlockTime(new Date(System.currentTimeMillis()));
             personRepository.save(person);
             throw ex;
@@ -140,6 +143,18 @@ public class AccountServiceImpl implements AccountService{
         }else{
             throw new UsernameNotFoundException("Email kullanılıyor: "+dto.getEmail());
         }
+    }
+
+    @Override
+    public String disable(PersonLoginDTO dto) {
+        Person person = personRepository.findByUsernameOrEmail(dto.getUsernameOrEmail(),dto.getUsernameOrEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("Username or Password is not corrected"));
+        if(!passwordEncoder.encode(dto.getPassword()).matches(person.getPassword())){
+            return "Username or Password is not corrected";
+        }
+        person.setEnable(false);
+        personRepository.save(person);
+        return "Account removed!";
     }
 
     private Person getPersonFromRequest(HttpServletRequest request) {

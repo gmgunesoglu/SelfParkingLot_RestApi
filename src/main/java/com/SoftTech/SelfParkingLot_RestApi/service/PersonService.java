@@ -1,11 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
-import com.SoftTech.SelfParkingLot_RestApi.dto.JwtToken;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonLoginDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 public interface PersonService {

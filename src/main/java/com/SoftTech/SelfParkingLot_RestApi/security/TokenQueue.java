@@ -6,16 +6,17 @@ public class TokenQueue {
 
     private String data=null;
     private String userName=null;
-    private Date initialDate=new Date(System.currentTimeMillis());
+    private Date initialDate=null;
     public TokenQueue next=null;
     public TokenQueue prev=null;
 
     public TokenQueue() {
     }
 
-    public TokenQueue(String data,String userName) {
+    public TokenQueue(String data,String userName, Date initialDate) {
         this.data = data;
         this.userName = userName;
+        this.initialDate = initialDate;
     }
 
     public String getData() {

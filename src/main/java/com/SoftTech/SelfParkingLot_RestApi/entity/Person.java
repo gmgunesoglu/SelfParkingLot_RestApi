@@ -118,7 +118,7 @@ public class Person implements UserDetails {
     private List<ParkingLot> parkingLots;     //Owner olduğu
 
     @OneToMany(targetEntity = Vehicle.class)
-    @JoinColumn(name="person_id",referencedColumnName = "id")
+    @JoinColumn(name="owner_id",referencedColumnName = "id")
     private List<Vehicle> Vehicles;
 
 

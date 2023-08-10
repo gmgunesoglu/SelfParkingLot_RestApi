@@ -41,10 +41,10 @@ public class Vehicle {
     private  int model;
 
     @Column(
-            name="vehicleType",
-            nullable = false
+            name="vehicleType"
     )
-    private  int vehicleType;
+    @Enumerated(EnumType.ORDINAL)
+    private  VehicleType vehicleType;
 
     @Column(
             name="plate",
@@ -55,10 +55,10 @@ public class Vehicle {
     private  String plate;
 
     @Column(
-            name = "person_id",
+            name = "owner_id",
             nullable = false
     )
-    private Long personId;
+    private Long ownerId;
 
     @Column(
             name = "enable",

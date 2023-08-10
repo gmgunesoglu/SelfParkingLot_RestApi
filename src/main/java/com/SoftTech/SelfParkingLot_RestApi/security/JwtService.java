@@ -24,8 +24,8 @@ public class JwtService {
         return extractClaim(jwtToken,Claims::getSubject);
     }
 
-    public String extractId(String jwtToken){
-        return extractClaim(jwtToken,Claims::getId);
+    public Long extractId(String jwtToken){
+        return Long.valueOf(extractClaim(jwtToken, Claims::getId));
     }
 
 

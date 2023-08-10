@@ -24,4 +24,6 @@ public interface AccountService {
     String changePassword(PersonChangePasswordDTO dto, HttpServletRequest request);
 
     Person personUpdate(PersonUpdateDTO dto, HttpServletRequest request);
+
+    String disable(PersonLoginDTO dto);
 }
