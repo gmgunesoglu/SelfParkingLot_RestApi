@@ -55,6 +55,12 @@ public class ParkingLot {
     )
     private  String address;
 
+    @Column(
+            name = "enable",
+            nullable = false
+    )
+    private boolean enable;
+
     @OneToMany(targetEntity = SharedParkingLot.class)
     @JoinColumn(name="parking_lot_id",referencedColumnName = "id")
     private List<SharedParkingLot> sharedParkingLots;    //Owner olduğu + ortaklık

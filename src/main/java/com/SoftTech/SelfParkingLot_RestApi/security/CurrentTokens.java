@@ -1,6 +1,7 @@
 package com.SoftTech.SelfParkingLot_RestApi.security;
 
 import lombok.Data;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.*;
 
@@ -8,8 +9,10 @@ import java.util.*;
 public class CurrentTokens {
     private TokenQueue queue=new TokenQueue();  //çift yönlü dairesel sıra
     private HashMap<String,String> hashMap = new HashMap<>();
+    private HashMap<String,Integer> multiLogins = new HashMap<>();
     private Timer timer = new Timer();  // farklı bir thread için...
     private int tokenDuration;
+    private final int tryLoginLimit = 3;  // token duration icerisinde 100 kere denerse blocklansın
 
     private TimerTask task = new TimerTask() {
         @Override
@@ -25,10 +28,16 @@ public class CurrentTokens {
 
     }
 
-    public void add(String token,String userName){
+    public void addToCache(String token,String userName){
         if(hashMap.containsKey(userName)){
-            //bunu yapmasam kötü niyetli bir kullanıcı ram i şişirebilir...
-            killAnyNodeFromQueue(userName);
+            if(countSessions(userName)==tryLoginLimit){
+                //kötü niyetli bir kullanıcı için...
+                //limite ulaştı ise veri tabanında blockla hashmapden sil
+                multiLogins.remove(userName);
+                hashMap.remove(userName);
+                System.out.println("[!] Kullanıcı blocklandı: "+userName);
+                throw new UsernameNotFoundException("Bad User.");
+            }
         }
         addToQueue(token,userName);
         hashMap.put(userName,token);
@@ -36,7 +45,7 @@ public class CurrentTokens {
 
     public String remove(String userName){
         hashMap.remove(userName);
-        killAnyNodeFromQueue(userName);
+        //killAnyNodeFromQueue(userName);
         System.out.println("[!] kullanıcı çıkış yaptı: "+userName);
         return "Çıkış başarılı.";
     }
@@ -70,7 +79,6 @@ public class CurrentTokens {
         }
     }
 
-
     private void removeFromQueue(){
         if(queue.getData()!=null){
             // 0 token degil...
@@ -91,38 +99,29 @@ public class CurrentTokens {
         }
     }
 
-    private void killAnyNodeFromQueue(String userName){
-        if(queue.getData()!=null){
-            // en az 1 dugum var
-            if(queue.getUserName().equals(userName)){
-                removeFromQueue();
-            }else{
-                // 1 den fazla dugum olmalı ve silinmesi gereken dugum ilk dugum degil
-                TokenQueue iter=queue;
-                while(!iter.getUserName().equals(userName) || iter.next!=queue){
-                    iter=iter.next;
-                }
-                if(iter.getUserName().equals(userName)){
-                    iter.prev.next=iter.next;
-                    iter.next.prev=iter.prev;
-                }else{
-                    System.out.println("[-] algoritma hatası: CurrentsTokens sınıfını takip et.");
-                }
-            }
-        }
-    }
-
     private void killDeadTokens(){
         Date killTime = new Date(System.currentTimeMillis()-tokenDuration);
         if(queue.getInitialDate()!=null && queue.getInitialDate().before(killTime)){
             //kuyrugun basını kontrol et burdan silinen olursa hashmap den de sil
             System.out.println("[!] Silinen token: "+queue.getData());
-            hashMap.remove(queue.getUserName());
+            hashMap.remove(queue.getUserName(),queue.getData());
+            //multi login yaptı ise sayısını 1 düşür
+            if(multiLogins.containsKey(queue.getUserName())){
+                int count = multiLogins.get(queue.getUserName());
+                if(count==1){
+                    multiLogins.remove(queue.getUserName());
+                    System.out.println("[!] Kullanıcı: "+queue.getUserName()+" için oturum sayısı: "+0);
+                }else{
+                    multiLogins.put(queue.getUserName(),--count);
+                    System.out.println("[!] Kullanıcı: "+queue.getUserName()+" için oturum sayısı: "+count);
+                }
+            }
             removeFromQueue();
             killDeadTokens();   //bir sonrakini de kontrol et
         }
     }
 
+    //silinecek
     public List<String> listQueue(){
         List<String> listQueue = new ArrayList<>();
         if(queue.getData()!=null){
@@ -141,6 +140,19 @@ public class CurrentTokens {
             return hashMap.get(username);
         }
         return "";
+    }
+
+    private int countSessions(String userName){
+        if(multiLogins.containsKey(userName)){
+            int session = multiLogins.get(userName);
+            multiLogins.put(userName,++session);
+            System.out.println("[!] Kullanıcı: "+userName+" için oturum sayısı: "+session);
+            return session;
+        }else{
+            System.out.println("[!] Kullanıcı: "+userName+" için oturum sayısı: "+2);
+            multiLogins.put(userName,2);
+            return 2;
+        }
     }
 
 }

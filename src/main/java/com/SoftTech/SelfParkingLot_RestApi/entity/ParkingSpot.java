@@ -62,6 +62,12 @@ public class ParkingSpot {
     )
     private boolean indoor;
 
+    @Column(
+            name = "enable",
+            nullable = false
+    )
+    private boolean enable;
+
     @OneToMany(targetEntity = Transaction.class)
     @JoinColumn(name="parking_spot_id",referencedColumnName = "id")
     private List<Transaction> transactions;

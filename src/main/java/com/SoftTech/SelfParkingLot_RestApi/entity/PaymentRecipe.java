@@ -74,6 +74,12 @@ public class PaymentRecipe {
     )
     private int hours24;
 
+    @Column(
+            name = "enable",
+            nullable = false
+    )
+    private boolean enable;
+
     @OneToMany(targetEntity = ParkingSpot.class)
     @JoinColumn(name="payment_recipe_id",referencedColumnName = "id")
     private List<ParkingSpot> parkingSpots;

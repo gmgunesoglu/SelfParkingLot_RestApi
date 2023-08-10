@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -87,6 +88,17 @@ public class Person implements UserDetails {
             unique = true
     )
     private String email;
+
+    @Column(
+            name = "enable",
+            nullable = false
+    )
+    private boolean enable;
+
+    @Column(
+            name = "block_time"
+    )
+    private Date blockTime;
 
 //    @ManyToMany(cascade = CascadeType.REMOVE)
 //    @JoinTable(

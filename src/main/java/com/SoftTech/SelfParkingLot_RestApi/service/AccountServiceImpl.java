@@ -6,19 +6,16 @@ import com.SoftTech.SelfParkingLot_RestApi.repository.PersonRepository;
 import com.SoftTech.SelfParkingLot_RestApi.security.CurrentTokens;
 import com.SoftTech.SelfParkingLot_RestApi.security.JWTAuthenticationFilter;
 import com.SoftTech.SelfParkingLot_RestApi.security.JwtService;
-import com.SoftTech.SelfParkingLot_RestApi.security.TokenQueue;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService{
@@ -53,6 +50,7 @@ public class AccountServiceImpl implements AccountService{
         person.setAuthority(dto.getAuthority());
         person.setPhoneNumber(dto.getPhoneNumber());
         person.setEmail(dto.getEmail());
+        person.setEnable(true);
         return personRepository.save(person);
     }
 
@@ -68,8 +66,31 @@ public class AccountServiceImpl implements AccountService{
         Person person;// = personRepository.findByUsernameOrEmail(dto.getUsernameOrEmail(),dto.getUsernameOrEmail()).get();
         person = personRepository.findByUsernameOrEmail(dto.getUsernameOrEmail(),dto.getUsernameOrEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found: "+dto.getUsernameOrEmail()));
+        if(!person.isEnable()){
+            throw new UsernameNotFoundException("Kullanıcı silinmiş!");
+        }
+        if(person.getBlockTime()!=null){
+            //blocklanmış ise...
+            if(person.getBlockTime().before(new Date(System.currentTimeMillis()-86400000))){
+                //block süresi geçti ise null yapıp login ol
+                person.setBlockTime(null);
+                personRepository.save(person);
+            }else{
+                // block süresi geçmedi ise login olma
+                // Hatta broda ip blocklamak gerekir. Tüm bu işlemler kötü niyetli kullanıcılara karşı sunucuyu savunma cabaları.
+                // ama kesin bir koruma yok, sadece yavaşlatma var. İp blocklama ile sunucu performansı çok iyi bir sekilde korunabilir
+
+                throw new UsernameNotFoundException("Sen çok kötüsün!");
+            }
+        }
         String token=jwtService.generateToken(person);
-        currentTokens.add(token,person.getUsername());
+        try{
+            currentTokens.addToCache(token,person.getUsername());
+        }catch (UsernameNotFoundException ex){
+            person.setBlockTime(new Date(System.currentTimeMillis()));
+            personRepository.save(person);
+            throw ex;
+        }
         return new JwtToken(token);
     }
 

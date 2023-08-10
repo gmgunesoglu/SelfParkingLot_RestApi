@@ -53,4 +53,10 @@ public class Transaction {
 
     @Column(name = "payment_id")
     private Long paymentId;
+
+    @Column(
+            name = "enable",
+            nullable = false
+    )
+    private boolean enable;
 }

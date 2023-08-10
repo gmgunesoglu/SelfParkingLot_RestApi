@@ -54,6 +54,12 @@ public class Location {
     )
     private  String district;
 
+    @Column(
+            name = "enable",
+            nullable = false
+    )
+    private boolean enable;
+
     //cascade yok!
     @OneToMany(targetEntity = ParkingLot.class)
     @JoinColumn(name="location_id",referencedColumnName = "id")

@@ -60,4 +60,9 @@ public class Vehicle {
     )
     private Long personId;
 
+    @Column(
+            name = "enable",
+            nullable = false
+    )
+    private boolean enable;
 }
