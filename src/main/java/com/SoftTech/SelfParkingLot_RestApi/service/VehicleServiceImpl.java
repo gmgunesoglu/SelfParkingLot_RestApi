@@ -1,5 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
+import ch.qos.logback.core.net.ObjectWriter;
 import com.SoftTech.SelfParkingLot_RestApi.dto.VehicleDTO;
 import com.SoftTech.SelfParkingLot_RestApi.dto.VehicleUpdateDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Vehicle;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.List;
 
 @Service
@@ -31,7 +33,7 @@ public class VehicleServiceImpl implements VehicleService{
     public Vehicle get(Long id, HttpServletRequest request) {
         Long ownerId = getOwnerIdFromRequest(request);
         Vehicle vehicle = vehicleRepository.getVehicleByIdAndEnable(id,true);
-        if(vehicle.getOwnerId()==ownerId){
+        if(vehicle.getOwnerId().equals(ownerId)){
             return vehicle;
         }else{
             throw new GlobalRuntimeException("You cannot see other users vehicle!", HttpStatus.UNAUTHORIZED);
@@ -40,13 +42,23 @@ public class VehicleServiceImpl implements VehicleService{
 
     @Override
     public Vehicle add(VehicleDTO dto, HttpServletRequest request) {
+        List<Vehicle> vehicles= vehicleRepository.findByPlateAndEnable(dto.getPlate(),true);
+        if(vehicles.size()>0){
+            // plaka bir kullanıcı tarafondan kullanılıyor...
+            throw new GlobalRuntimeException("This plate is already using! ",HttpStatus.BAD_REQUEST);
+        }
         Long ownerId = getOwnerIdFromRequest(request);
-        Vehicle vehicle = new Vehicle();
+        Vehicle vehicle = vehicleRepository.findByOwnerIdAndPlate(ownerId,dto.getPlate());
+        if(vehicle==null){
+            // kullanıcının bu plakada aracı yok ise
+            vehicle = new Vehicle();
+        }
         vehicle.setColor(dto.getColor());
         vehicle.setVehicleType(dto.getVehicleType());
         vehicle.setModel(dto.getModel());
         vehicle.setPlate(dto.getPlate());
         vehicle.setOwnerId(ownerId);
+        vehicle.setAddedDate(new Date(System.currentTimeMillis()));
         vehicle.setEnable(true);
         return vehicleRepository.save(vehicle);
     }
@@ -55,7 +67,7 @@ public class VehicleServiceImpl implements VehicleService{
     public Vehicle update(VehicleUpdateDTO dto, Long id, HttpServletRequest request) {
         Long ownerId = getOwnerIdFromRequest(request);
         Vehicle vehicle = vehicleRepository.getVehicleByIdAndEnable(id,true);
-        if(vehicle.getOwnerId()==ownerId){
+        if(vehicle.getOwnerId().equals(ownerId)){
             vehicle.setVehicleType(dto.getVehicleType());
             vehicle.setColor(dto.getColor());
             vehicle.setModel(dto.getModel());
@@ -69,8 +81,9 @@ public class VehicleServiceImpl implements VehicleService{
     public String disable(Long id, HttpServletRequest request) {
         Long ownerId = getOwnerIdFromRequest(request);
         Vehicle vehicle = vehicleRepository.getVehicleByIdAndEnable(id,true);
-        if(vehicle.getOwnerId()==ownerId){
+        if(vehicle.getOwnerId().equals(ownerId)){
             vehicle.setEnable(false);
+            vehicle.setRemovedDate(new Date(System.currentTimeMillis()));
             vehicleRepository.save(vehicle);
             return "The vehicle is removed!";
         }else{

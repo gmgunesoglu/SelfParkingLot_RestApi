@@ -8,6 +8,7 @@ import java.util.List;
 public interface VehicleRepository extends JpaRepository<Vehicle,Long> {
     List<Vehicle> getVehiclesByOwnerIdAndEnable(Long ownerId,boolean enabled);
     Vehicle getVehicleByIdAndEnable(Long id,boolean enabled);
-
+    Vehicle findByOwnerIdAndPlate(Long ownerId, String plate);
+    List<Vehicle> findByPlateAndEnable(String plate,Boolean enable);
 
 }

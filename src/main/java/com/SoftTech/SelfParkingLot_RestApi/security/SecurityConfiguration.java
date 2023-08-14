@@ -25,7 +25,7 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/account/register","/account/login","/account/queue","/account/tokens").permitAll()
+                .requestMatchers("**","/account/register","/account/login","/account/queue","/account/tokens").permitAll()
                 .requestMatchers("/customer").hasAnyAuthority("CUSTOMER","USER","ADMIN")
                 .requestMatchers("/user").hasAnyAuthority("USER","ADMIN")
                 .requestMatchers("/admin").hasAuthority("ADMIN")

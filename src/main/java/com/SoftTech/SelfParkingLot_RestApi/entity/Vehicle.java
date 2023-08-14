@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+
 @Entity
-@Table(name="vehicle")
+@Table(name = "vehicle")
 @Data
 @RequiredArgsConstructor
 public class Vehicle {
@@ -41,7 +44,8 @@ public class Vehicle {
     private  int model;
 
     @Column(
-            name="vehicleType"
+            name="vehicleType",
+            nullable = false
     )
     @Enumerated(EnumType.ORDINAL)
     private  VehicleType vehicleType;
@@ -49,8 +53,7 @@ public class Vehicle {
     @Column(
             name="plate",
             nullable = false,
-            length = 12,
-            unique = true
+            length = 12
     )
     private  String plate;
 
@@ -59,6 +62,17 @@ public class Vehicle {
             nullable = false
     )
     private Long ownerId;
+
+    @Column(
+            name = "added_date",
+            nullable = false
+    )
+    private Date addedDate;
+
+    @Column(
+            name = "removed_date"
+    )
+    private Date removedDate;
 
     @Column(
             name = "enable",

@@ -1,5 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.security;
 
+import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,7 +19,7 @@ import java.util.function.Function;
 public class JwtService {
 
     private static final String SECRET_KEY = "e34bc93bce34083f4dc6900e986019e7f08cf994c01046348dd69f8f05f00cb9";
-    private static final int tokenDuration = 30000;//3600000; // 60dk
+    private static final int TOKEN_DURATION = 1800000;//1800000; // 30dk
 
     public String extractUsername(String jwtToken){
         return extractClaim(jwtToken,Claims::getSubject);
@@ -27,7 +28,6 @@ public class JwtService {
     public Long extractId(String jwtToken){
         return Long.valueOf(extractClaim(jwtToken, Claims::getId));
     }
-
 
     public <T> T extractClaim(String jwtToken, Function<Claims,T> claimResolver){
         final Claims claims = extractAllClaims(jwtToken);
@@ -48,20 +48,21 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(UserDetails userDetails){
-        return generateToken(new HashMap<>(),userDetails);
+    public String generateToken(Person person){
+        return generateToken(new HashMap<>(),person);
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            Person person
     ){
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(person.getUsername())
+                .setId(person.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+tokenDuration))
+                .setExpiration(new Date(System.currentTimeMillis()+ TOKEN_DURATION))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -84,6 +85,6 @@ public class JwtService {
     }
 
     public int getTokenDuration(){
-        return tokenDuration;
+        return TOKEN_DURATION;
     }
 }

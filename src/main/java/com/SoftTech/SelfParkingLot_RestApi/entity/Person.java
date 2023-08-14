@@ -75,6 +75,12 @@ public class Person implements UserDetails {
     private Authority authority;
 
     @Column(
+            name = "secret_key",
+            length = 30
+    )
+    private String secretKey;
+
+    @Column(
             name="phone_number",
             nullable = false,
             length = 15

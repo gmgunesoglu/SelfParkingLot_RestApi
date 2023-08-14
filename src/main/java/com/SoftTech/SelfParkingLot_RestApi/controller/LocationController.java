@@ -14,27 +14,23 @@ public class LocationController {
     private final LocationService locationService;
 
     @GetMapping
-    public List<Location> getLocations(){
-        return locationService.getAll();
+    public List<String> getCities(){
+        return locationService.getCities();
     }
 
-    @GetMapping("/{id}")
-    public Location getLocation(@PathVariable Long id){
-        return locationService.get(id);
+    @GetMapping("/{city}")
+    public List<String> getTowns(@PathVariable String city){
+        return locationService.getTowns(city);
     }
 
-    @PostMapping
-    public Location saveLocation(@RequestBody Location location){
-        return locationService.save(location);
+    @GetMapping("/{city}/{town}")
+    public List<String> getDistricts(@PathVariable String city,@PathVariable String town){
+        return locationService.getDistricts(city,town);
     }
 
-    @PutMapping("/{id}")
-    public Location updateLocation(@PathVariable Long id, @RequestBody Location location){
-        return locationService.update(location,id);
+    @GetMapping("/{city}/{town}/{district}")
+    public Long getLocation(@PathVariable String city,@PathVariable String town,@PathVariable String district){
+        return locationService.getId(city, town, district);
     }
 
-    @DeleteMapping("/{id}")
-    public Location deleteLocation(@PathVariable Long id){
-        return locationService.delete(id);
-    }
 }
