@@ -29,32 +29,32 @@ public class LocationServiceImpl implements LocationService{
 
     @Override
     public List<String> getTowns(String city) {
-        return locationRepository.getTowns(city);
+        return locationRepository.getTowns(city.toUpperCase());
     }
 
     @Override
     public List<String> getDistricts(String city, String town) {
-        return locationRepository.getDistricts(city,town);
+        return locationRepository.getDistricts(city.toUpperCase(),town.toUpperCase());
     }
 
     @Override
     public Long getId(String city, String town, String district) {
-        return locationRepository.getId(city,town,district);
+        return locationRepository.getId(city.toUpperCase(),town.toUpperCase(),district.toUpperCase());
     }
 
     @Override
     public Location add(LocationDTO dto) {
         Location location = new Location();
-        location.setCity(dto.getCity());
-        location.setTown(dto.getTown());
-        location.setDistrict(dto.getDistrict());
+        location.setCity(dto.getCity().toUpperCase());
+        location.setTown(dto.getTown().toUpperCase());
+        location.setDistrict(dto.getDistrict().toUpperCase());
         location.setEnable(true);
 
         try{
             return locationRepository.save(location);
         }catch (DataIntegrityViolationException e){
             // aynı il/ilçe/mahalle veri var ise...
-            Location oldLocation = locationRepository.getLocationsByCityAndTownAndDistrict(dto.getCity(),dto.getTown(),dto.getDistrict());
+            Location oldLocation = locationRepository.getLocationsByCityAndTownAndDistrict(dto.getCity().toUpperCase(),dto.getTown().toUpperCase(),dto.getDistrict().toUpperCase());
             if(oldLocation.isEnable()){
                 return oldLocation;
             }else{
@@ -73,9 +73,9 @@ public class LocationServiceImpl implements LocationService{
         }if(!location.isEnable()){
             throw new GlobalRuntimeException("Location is disable! ", HttpStatus.BAD_REQUEST);
         }
-        location.setCity(dto.getCity());
-        location.setTown(dto.getTown());
-        location.setDistrict(dto.getDistrict());
+        location.setCity(dto.getCity().toUpperCase());
+        location.setTown(dto.getTown().toUpperCase());
+        location.setDistrict(dto.getDistrict().toUpperCase());
         return locationRepository.save(location);
     }
 

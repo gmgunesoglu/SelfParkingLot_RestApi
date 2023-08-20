@@ -1,9 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.controller;
 
-import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotListDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotShareDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonPartnerDTO;
+import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.ParkingLot;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.service.ParkingLotService;
@@ -13,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/parkinglots")
+@RequestMapping("/user/parkinglots")
 @RequiredArgsConstructor
 public class ParkingLotController {
 
@@ -50,7 +47,7 @@ public class ParkingLotController {
     }
 
     @DeleteMapping("/share/{id}")
-    public PersonPartnerDTO closeShare(HttpServletRequest request, @RequestBody ParkingLotShareDTO dto, @PathVariable Long id){
+    public PersonPartnerDTO closeShare(HttpServletRequest request, @RequestBody ParkingLotCloseShareDTO dto, @PathVariable Long id){
         return parkingLotService.closeShare(request,dto,id);
     }
 

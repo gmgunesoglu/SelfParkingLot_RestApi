@@ -2,7 +2,6 @@ package com.SoftTech.SelfParkingLot_RestApi.controller;
 
 import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
-import com.SoftTech.SelfParkingLot_RestApi.security.TokenQueue;
 import com.SoftTech.SelfParkingLot_RestApi.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +49,8 @@ public class AccountController {
     }
 
     @DeleteMapping
-    public String disable(@RequestBody PersonLoginDTO dto){
-        return accountService.disable(dto);
+    public String disable(HttpServletRequest request, @RequestBody PersonLoginDTO dto){
+        return accountService.disable(request,dto);
     }
 
     //geçici
@@ -64,6 +63,11 @@ public class AccountController {
     @GetMapping("/queue")
     public List<String> listQueue(){
         return accountService.listQueue();
+    }
+
+    @GetMapping("/test")
+    public List<TestDTO> test(){
+        return accountService.test();
     }
 
 

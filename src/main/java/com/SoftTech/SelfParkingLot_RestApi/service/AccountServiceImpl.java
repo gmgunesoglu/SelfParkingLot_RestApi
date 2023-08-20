@@ -45,6 +45,10 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public Person register(PersonDTO dto) {
+        if(personRepository.checkWithUsernameOrEmail(dto.getUserName(),dto.getEmail())!=null){
+            throw new GlobalRuntimeException("Username or email is already used!",HttpStatus.BAD_REQUEST);
+        }
+
         Person person = new Person();
         person.setUsername(dto.getUserName());
         person.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -117,7 +121,7 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public String changePassword(PersonChangePasswordDTO dto, HttpServletRequest request) {
         Person person = getPersonFromRequest(request);
-        if(passwordEncoder.encode(dto.getOldPassword()).matches(person.getPassword())){
+        if(passwordEncoder.matches(dto.getOldPassword(),person.getPassword())){
             // şifre doğru, güncelle
             person.setPassword(passwordEncoder.encode(dto.getNewPassword()));
             personRepository.save(person);
@@ -132,29 +136,44 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public Person personUpdate(PersonUpdateDTO dto, HttpServletRequest request) {
-        Person person = personRepository.findByEmail(dto.getEmail()).get();
-        if(person==null){
-            person=getPersonFromRequest(request);
-            person.setEmail(dto.getEmail());
-            person.setFirstName(dto.getFirstName());
-            person.setLastName(dto.getLastName());
-            person.setEmail(dto.getEmail());
-            return personRepository.save(person);
+        Person person = personRepository.getPersonByEmail(dto.getEmail());
+        if(person!=null){
+            // email kullanılıyor.
+            person = getPersonFromRequest(request);
+            if(!person.getEmail().equals(dto.getEmail())){
+                throw new UsernameNotFoundException("Email is already uses! "+dto.getEmail());
+            }
         }else{
-            throw new UsernameNotFoundException("Email kullanılıyor: "+dto.getEmail());
+            person = getPersonFromRequest(request);
         }
+        person.setEmail(dto.getEmail());
+        person.setFirstName(dto.getFirstName());
+        person.setLastName(dto.getLastName());
+        person.setPhoneNumber(dto.getPhoneNumber());
+        person.setSecretKey(dto.getSecretKey());
+        return personRepository.save(person);
     }
 
     @Override
-    public String disable(PersonLoginDTO dto) {
-        Person person = personRepository.findByUsernameOrEmail(dto.getUsernameOrEmail(),dto.getUsernameOrEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Username or Password is not corrected"));
-        if(!passwordEncoder.encode(dto.getPassword()).matches(person.getPassword())){
+    public String disable(HttpServletRequest request, PersonLoginDTO dto) {
+        //kullanıcıyı çek
+        Person person = getPersonFromRequest(request);
+        if(!person.getUsername().equals(dto.getUsernameOrEmail())&&person.getEmail().equals(dto.getUsernameOrEmail())){
+            // username/email yanlış ise...
+            new UsernameNotFoundException("Username or Password is not corrected");
+        }
+        if(!passwordEncoder.matches(dto.getPassword(),person.getPassword())){
             return "Username or Password is not corrected";
         }
         person.setEnable(false);
+        currentTokens.remove(person.getUsername());
         personRepository.save(person);
         return "Account removed!";
+    }
+
+    @Override
+    public List<TestDTO> test() {
+        return personRepository.test();
     }
 
     private Person getPersonFromRequest(HttpServletRequest request) {

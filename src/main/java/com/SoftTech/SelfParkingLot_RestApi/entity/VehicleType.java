@@ -1,10 +1,9 @@
 package com.SoftTech.SelfParkingLot_RestApi.entity;
 
 public enum VehicleType {
-    TIR,
-    KAMYON,
-    OTOBUS,
+    TRUCK,
+    BUS,
     MINIBUS,
-    OTOMOBIL,
-    MOTOSIKLET
+    CAR,
+    MOTORCYCLE
 }

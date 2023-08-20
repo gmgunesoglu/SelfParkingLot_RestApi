@@ -2,9 +2,7 @@ package com.SoftTech.SelfParkingLot_RestApi.service;
 
 import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
-import com.SoftTech.SelfParkingLot_RestApi.security.TokenQueue;
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,5 +23,7 @@ public interface AccountService {
 
     Person personUpdate(PersonUpdateDTO dto, HttpServletRequest request);
 
-    String disable(PersonLoginDTO dto);
+    String disable(HttpServletRequest request,PersonLoginDTO dto);
+
+    List<TestDTO> test();
 }

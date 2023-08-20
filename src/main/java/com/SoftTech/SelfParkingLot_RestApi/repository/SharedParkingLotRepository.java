@@ -1,5 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.repository;
 
+import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingSpotInfoDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.ParkingLot;
 import com.SoftTech.SelfParkingLot_RestApi.entity.SharedParkingLot;
 import com.SoftTech.SelfParkingLot_RestApi.entity.SharedParkingLotId;
@@ -18,5 +19,10 @@ public interface SharedParkingLotRepository extends JpaRepository<SharedParkingL
 
     SharedParkingLot getSharedParkingLotByParkingLotIdAndPartnerId(Long parkingLotId,Long partnerId);
 
+    @Query("SELECT true FROM SharedParkingLot s WHERE s.parkingLotId = :parkingLotId AND s.partnerId = :partnerId")
+    Boolean checkWithPartnerIdAndParkingLotId(Long partnerId, Long parkingLotId);
 
+    @Query("SELECT new com.SoftTech.SelfParkingLot_RestApi.dto.ParkingSpotInfoDTO(p.name,l.city,l.town,l.district,p.address) FROM " +
+            "SharedParkingLot sp JOIN ParkingLot p ON sp.parkingLotId=p.id JOIN Location l ON p.locationId=l.id WHERE sp.partnerId=:partnerId AND p.enable=true AND l.enable=true")
+    List<ParkingSpotInfoDTO> getAllParkingSpotInfoDTOOfPartner(Long partnerId);
 }

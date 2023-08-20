@@ -2,7 +2,9 @@ package com.SoftTech.SelfParkingLot_RestApi.controller;
 
 import com.SoftTech.SelfParkingLot_RestApi.dto.LocationDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Location;
+import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.service.LocationService;
+import com.SoftTech.SelfParkingLot_RestApi.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,12 @@ import java.util.List;
 public class AdminController {
 
     private final LocationService locationService;
+    private final PersonService personService;
+
+    @GetMapping
+    public String test(){
+        return "admin test ok";
+    }
 
     @GetMapping("/locations")
     public List<Location> getAllLocation(){
@@ -40,4 +48,8 @@ public class AdminController {
         return locationService.disable(id);
     }
 
+    @GetMapping("/accounts")
+    public List<Person> getAllUsers(){
+        return personService.getAll();
+    }
 }

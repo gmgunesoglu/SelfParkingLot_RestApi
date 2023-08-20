@@ -9,6 +9,8 @@ import java.util.List;
 public class ParkingLotPartnerDTO {
 
     private List<PersonPartnerDTO> partners;
+
+    private Long id;
     private String name;
     private String city;
     private String town;

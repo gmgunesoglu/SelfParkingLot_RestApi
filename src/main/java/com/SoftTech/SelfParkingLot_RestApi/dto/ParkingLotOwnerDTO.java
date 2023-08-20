@@ -8,6 +8,8 @@ import lombok.Data;
 public class ParkingLotOwnerDTO {
 
     private PersonPartnerDTO owner;
+
+    private Long Id;
     private String name;
     private String city;
     private String town;

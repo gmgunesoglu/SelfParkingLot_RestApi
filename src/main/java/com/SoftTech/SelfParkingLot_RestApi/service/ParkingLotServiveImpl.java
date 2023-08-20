@@ -36,7 +36,7 @@ public class ParkingLotServiveImpl implements ParkingLotService{
         Long ownerId = getOwnerIdFromRequest(request);
         ParkingLotListDTO dto = new ParkingLotListDTO();
         List<ParkingLot> myParkingLots = parkingLotRepository.findByOwnerIdAndEnable(ownerId,true);
-        List<ParkingLot> otherParkingLots = new ArrayList<>();
+//        List<ParkingLot> otherParkingLots = new ArrayList<>();
         List<ParkingLotPartnerDTO> underMyRule = new ArrayList<>();
         List<ParkingLotOwnerDTO> upperMyRule = new ArrayList<>();
         for(ParkingLot myParkingLot : myParkingLots){
@@ -54,6 +54,7 @@ public class ParkingLotServiveImpl implements ParkingLotService{
             Location location = locationRepository.getLocationByIdAndEnable(myParkingLot.getLocationId(),true);
             underMyRule.add(ParkingLotPartnerDTO.builder()
                     .partners(partners)
+                    .id(myParkingLot.getId())
                     .name(myParkingLot.getName())
                     .city(location.getCity())
                     .town(location.getTown())
@@ -72,6 +73,7 @@ public class ParkingLotServiveImpl implements ParkingLotService{
                             .userName(owner.getUsername())
                             .email(owner.getEmail())
                             .phoneNumber(owner.getPhoneNumber()).build())
+                    .Id(parkingLot.getId())
                     .name(parkingLot.getName())
                     .city(location.getCity())
                     .town(location.getTown())
@@ -172,7 +174,7 @@ public class ParkingLotServiveImpl implements ParkingLotService{
         // parkinglot kendisine mi ait kontrol et
         Long ownerId = getOwnerIdFromRequest(request);
         if(!ownerId.equals(parkingLot.getOwnerId())){
-            throw new GlobalRuntimeException("You can't share other users parking lot! ", HttpStatus.UNAUTHORIZED);
+            throw new GlobalRuntimeException("You can't open share other users parking lot! ", HttpStatus.UNAUTHORIZED);
         }
         // partner kontrol et
         Person partner = personRepository.getPersonByUsernameAndEnable(dto.getSharedUsername(),true);
@@ -202,7 +204,7 @@ public class ParkingLotServiveImpl implements ParkingLotService{
     }
 
     @Override
-    public PersonPartnerDTO closeShare(HttpServletRequest request, ParkingLotShareDTO dto, Long id) {
+    public PersonPartnerDTO closeShare(HttpServletRequest request, ParkingLotCloseShareDTO dto, Long id) {
         // parkinglot id varmı kontrol et
         ParkingLot parkingLot = parkingLotRepository.getParkingLotByIdAndEnable(id,true);
         if(parkingLot == null){
@@ -211,15 +213,25 @@ public class ParkingLotServiveImpl implements ParkingLotService{
         // parkinglot kendisine mi ait kontrol et
         Long ownerId = getOwnerIdFromRequest(request);
         if(!ownerId.equals(parkingLot.getOwnerId())){
-            throw new GlobalRuntimeException("You can't share other users parking lot! ", HttpStatus.UNAUTHORIZED);
+            SharedParkingLot sharedParkingLot = sharedParkingLotRepository.getSharedParkingLotByParkingLotIdAndPartnerId(id,ownerId);
+            if(sharedParkingLot==null){
+                // owner değil ortak da değil
+                throw new GlobalRuntimeException("You can't close share other users parking lot! ", HttpStatus.UNAUTHORIZED);
+            }
+            // ortak
+            sharedParkingLotRepository.delete(sharedParkingLot);
+            Person person = personRepository.findById(parkingLot.getOwnerId()).get();
+            return PersonPartnerDTO.builder()
+                    .userName(person.getUsername())
+                    .firstName(person.getFirstName())
+                    .lastName(person.getLastName())
+                    .phoneNumber(person.getPhoneNumber())
+                    .email(person.getEmail()).build();
         }
         // partner kontrol et
         Person partner = personRepository.getPersonByUsernameAndEnable(dto.getSharedUsername(),true);
         if(partner==null){
             throw new GlobalRuntimeException("Partner not found! ",HttpStatus.NOT_FOUND);
-        }
-        if(!partner.getSecretKey().equals(dto.getSecretKey())){
-            throw new GlobalRuntimeException("Secret key incorrect! ",HttpStatus.UNAUTHORIZED);
         }
         // paylaşımda mı kontrol et
         SharedParkingLot sharedParkingLot = sharedParkingLotRepository.getSharedParkingLotByParkingLotIdAndPartnerId(id,partner.getId());
@@ -264,6 +276,7 @@ public class ParkingLotServiveImpl implements ParkingLotService{
         }
         // owner ile partner ı değiştir
         parkingLot.setOwnerId(partner.getId());
+        sharedParkingLotRepository.delete(sharedParkingLot);
         sharedParkingLot.setPartnerId(ownerId);
         sharedParkingLotRepository.save(sharedParkingLot);
         parkingLotRepository.save(parkingLot);

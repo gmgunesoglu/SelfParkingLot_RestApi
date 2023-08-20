@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "payment_recipe", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"parking_lot_id", "commet"})
+        @UniqueConstraint(columnNames = {"parking_lot_id", "tag"})
 })
 @Data
 @RequiredArgsConstructor
@@ -38,11 +38,11 @@ public class PaymentRecipe {
     private Long parkingLotId;
 
     @Column(
-            name="commet",
+            name="tag",
             nullable = false,
-            length = 20
+            length = 26
     )
-    private  String commet;
+    private  String tag;
 
     @Column(
             name = "hours_2",
