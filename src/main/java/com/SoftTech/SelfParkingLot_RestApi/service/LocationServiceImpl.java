@@ -1,9 +1,11 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
 import com.SoftTech.SelfParkingLot_RestApi.dto.LocationDTO;
+import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotFindDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Location;
 import com.SoftTech.SelfParkingLot_RestApi.exceptionhandling.GlobalRuntimeException;
 import com.SoftTech.SelfParkingLot_RestApi.repository.LocationRepository;
+import com.SoftTech.SelfParkingLot_RestApi.repository.ParkingLotRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.tool.schema.spi.SqlScriptException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLData;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +23,7 @@ import java.util.List;
 public class LocationServiceImpl implements LocationService{
 
     private final LocationRepository locationRepository;
+    private final ParkingLotRepository parkingLotRepository;
 
 
     @Override
@@ -100,6 +104,29 @@ public class LocationServiceImpl implements LocationService{
     @Override
     public Location get(Long id) {
         return locationRepository.findById(id).get();
+    }
+
+    @Override
+    public List<ParkingLotFindDTO> findParkingLots(LocationDTO dto) {
+
+        //location id leri çek
+        List<Long> locationIds;
+        if(dto.getCity()==null){
+            locationIds=locationRepository.getAllLocationIdByEnable(true);
+        }else if(dto.getTown()==null){
+            locationIds=locationRepository.getAllLocationIdByCityAndEnable(dto.getCity(),true);
+        }else if(dto.getDistrict()==null){
+            locationIds=locationRepository.getAllLocationIdByCityAndTownAndEnable(dto.getCity(),dto.getTown(),true);
+        }else{
+            locationIds=locationRepository.getAllLocationsByCityAndTownAndDistrictAndEnable(dto.getCity(),dto.getTown(),dto.getDistrict(),true);
+        }
+
+        //id lerden dto listesini çek
+        List<ParkingLotFindDTO> dtos = new ArrayList<>();
+        for(Long locationId : locationIds){
+            dtos.add(parkingLotRepository.getParkingLotFindDTO(locationId));
+        }
+        return dtos;
     }
 
 

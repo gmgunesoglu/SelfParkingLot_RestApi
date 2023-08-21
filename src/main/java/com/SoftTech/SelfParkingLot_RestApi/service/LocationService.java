@@ -1,6 +1,7 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
 import com.SoftTech.SelfParkingLot_RestApi.dto.LocationDTO;
+import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotFindDTO;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Location;
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface LocationService {
     List<Location> getAll();
 
     Location get(Long id);
+
+    List<ParkingLotFindDTO> findParkingLots(LocationDTO dto);
 }

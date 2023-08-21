@@ -1,5 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.repository;
 
+import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotFindDTO;
 import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotWithTListDTO;
 import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingSpotShowDTO;
 import com.SoftTech.SelfParkingLot_RestApi.dto.PaymentRecipeDetailDTO;
@@ -34,7 +35,9 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot,Long> {
             "ParkingLot p JOIN Location l ON p.locationId=l.id WHERE p.enable=true AND l.enable=true AND p.id = :parkingLotId")
     ParkingLotWithTListDTO getParkingLotWithTListDTO(Long parkingLotId);
 
-
+    @Query("SELECT new com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotFindDTO(p.id,p.name,l.city,l.town,l.district,p.address) FROM " +
+            "ParkingLot p JOIN Location l ON p.locationId=l.id WHERE p.enable=true AND p.locationId=:locationId")
+    ParkingLotFindDTO getParkingLotFindDTO(Long locationId);
 
     @Query("SELECT true FROM ParkingLot p WHERE p.id=:id AND p.enable=true")
     Boolean checkWithIdAndEnable(Long id);

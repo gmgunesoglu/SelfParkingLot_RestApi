@@ -18,10 +18,24 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     @Query("SELECT DISTINCT l.district FROM Location l WHERE l.enable=true AND l.city = :city AND l.town = :town")
     List<String> getDistricts(@Param("city") String city, @Param("town") String town);
 
-    @Query("SELECT  l.id FROM Location l WHERE l.enable=true AND l.city = :city AND l.town = :town and l.district = :district")
+    @Query("SELECT  l.id FROM Location l WHERE l.enable=true AND l.city = :city AND l.town = :town AND l.district = :district")
     Long getId(@Param("city") String city, @Param("town") String town, @Param("district") String district);
 
     Location getLocationsByCityAndTownAndDistrict(String city,String town,String district);
+
+    @Query("SELECT  l.id FROM Location l WHERE l.enable = :enable AND l.city = :city AND l.town = :town AND l.district = :district")
+    List<Long> getAllLocationsByCityAndTownAndDistrictAndEnable(String city,String town,String district,Boolean enable);
+
+    @Query("SELECT  l.id FROM Location l WHERE l.enable=:enable AND l.city = :city AND l.town = :town")
+    List<Long> getAllLocationIdByCityAndTownAndEnable(String city,String town,Boolean enable);
+
+    @Query("SELECT  l.id FROM Location l WHERE l.enable=:enable AND l.city = :city")
+    List<Long> getAllLocationIdByCityAndEnable(String city,Boolean enable);
+
+    @Query("SELECT  l.id FROM Location l WHERE l.enable=:enable")
+    List<Long> getAllLocationIdByEnable(Boolean enable);
+
+
 
     Location getLocationByIdAndEnable(Long locationId, boolean enable);
 }
