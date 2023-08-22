@@ -27,4 +27,11 @@ public class PaymentRecipeDTO {
         this.hours10 = hours10;
         this.hours24 = hours24;
     }
+    public PaymentRecipeDTO(int hours2, int hours4, int hours6, int hours10, int hours24) {
+        this.hours2 = hours2;
+        this.hours4 = hours4;
+        this.hours6 = hours6;
+        this.hours10 = hours10;
+        this.hours24 = hours24;
+    }
 }

@@ -127,10 +127,10 @@ public class AccountServiceImpl implements AccountService{
             personRepository.save(person);
             // sistemden çıkış yap
             currentTokens.remove(person.getUsername());
-            return "Şifreniz güncellendi, yeni şifrenizle giriş yapabilirsiniz.";
+            return "Password changed, you can login now.";
         }else{
             // şifre yanlış
-            return "Şifre hatalı!";
+            return "Password is incorrect!";
         }
     }
 
@@ -169,11 +169,6 @@ public class AccountServiceImpl implements AccountService{
         currentTokens.remove(person.getUsername());
         personRepository.save(person);
         return "Account removed!";
-    }
-
-    @Override
-    public List<TestDTO> test() {
-        return personRepository.test();
     }
 
     private Person getPersonFromRequest(HttpServletRequest request) {

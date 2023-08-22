@@ -1,6 +1,5 @@
 package com.SoftTech.SelfParkingLot_RestApi.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data

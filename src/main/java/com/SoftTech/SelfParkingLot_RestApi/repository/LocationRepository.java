@@ -35,7 +35,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     @Query("SELECT  l.id FROM Location l WHERE l.enable=:enable")
     List<Long> getAllLocationIdByEnable(Boolean enable);
 
-
+    List<Location> getAllByEnable(boolean enable);
 
     Location getLocationByIdAndEnable(Long locationId, boolean enable);
 }

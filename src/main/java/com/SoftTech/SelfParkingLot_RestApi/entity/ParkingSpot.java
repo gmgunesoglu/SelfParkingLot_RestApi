@@ -63,6 +63,12 @@ public class ParkingSpot {
     private boolean indoor;
 
     @Column(
+            name = "occupied",
+            nullable = false
+    )
+    private boolean occupied;
+
+    @Column(
             name = "enable",
             nullable = false
     )

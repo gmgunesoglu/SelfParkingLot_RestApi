@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Table(name="transaction")
@@ -46,13 +46,16 @@ public class Transaction {
             name="entery_date",
             nullable = false
     )
-    private Timestamp enteryDate;
+    private Date enteryDate;
 
     @Column(name = "exit_date")
-    private Timestamp exitDate;
+    private Date exitDate;
 
-    @Column(name = "payment_id")
-    private Long paymentId;
+    @Column(
+            name = "payment_token",
+            length = 64
+    )
+    private String  paymentToken;
 
     @Column(
             name = "enable",

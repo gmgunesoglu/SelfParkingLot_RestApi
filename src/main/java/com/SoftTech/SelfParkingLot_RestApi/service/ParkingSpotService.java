@@ -1,9 +1,6 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
-import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingLotWithTListDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingSpotAddDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingSpotDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.ParkingSpotShowDTO;
+import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.ParkingSpot;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -20,4 +17,6 @@ public interface ParkingSpotService {
     ParkingSpotShowDTO update(HttpServletRequest request, ParkingSpotAddDTO dto, Long id);
 
     String disable(HttpServletRequest request, Long id);
+
+    ParkingLotWithTListDTO<ParkingSpotDetailDTO> findParkingSpots(Long parkingLotId);
 }

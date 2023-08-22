@@ -64,11 +64,4 @@ public class AccountController {
     public List<String> listQueue(){
         return accountService.listQueue();
     }
-
-    @GetMapping("/test")
-    public List<TestDTO> test(){
-        return accountService.test();
-    }
-
-
 }

@@ -108,14 +108,16 @@ public class LocationServiceImpl implements LocationService{
 
     @Override
     public List<ParkingLotFindDTO> findParkingLots(LocationDTO dto) {
-
+        dto.setCity(dto.getCity().toUpperCase());
+        dto.setTown(dto.getTown().toUpperCase());
+        dto.setDistrict(dto.getDistrict().toUpperCase());
         //location id leri çek
         List<Long> locationIds;
-        if(dto.getCity()==null){
+        if(dto.getCity()==null || dto.getCity().equals("")){
             locationIds=locationRepository.getAllLocationIdByEnable(true);
-        }else if(dto.getTown()==null){
+        }else if(dto.getTown()==null || dto.getTown().equals("")){
             locationIds=locationRepository.getAllLocationIdByCityAndEnable(dto.getCity(),true);
-        }else if(dto.getDistrict()==null){
+        }else if(dto.getDistrict()==null || dto.getDistrict().equals("")){
             locationIds=locationRepository.getAllLocationIdByCityAndTownAndEnable(dto.getCity(),dto.getTown(),true);
         }else{
             locationIds=locationRepository.getAllLocationsByCityAndTownAndDistrictAndEnable(dto.getCity(),dto.getTown(),dto.getDistrict(),true);
@@ -124,7 +126,10 @@ public class LocationServiceImpl implements LocationService{
         //id lerden dto listesini çek
         List<ParkingLotFindDTO> dtos = new ArrayList<>();
         for(Long locationId : locationIds){
-            dtos.add(parkingLotRepository.getParkingLotFindDTO(locationId));
+            ParkingLotFindDTO parkingLotFindDTO = parkingLotRepository.getParkingLotFindDTO(locationId);
+            if(parkingLotFindDTO!=null){
+                dtos.add(parkingLotFindDTO);
+            }
         }
         return dtos;
     }

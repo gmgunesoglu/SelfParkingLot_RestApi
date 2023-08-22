@@ -24,6 +24,4 @@ public interface AccountService {
     Person personUpdate(PersonUpdateDTO dto, HttpServletRequest request);
 
     String disable(HttpServletRequest request,PersonLoginDTO dto);
-
-    List<TestDTO> test();
 }

@@ -28,4 +28,7 @@ public interface PaymentRecipeRepository extends JpaRepository<PaymentRecipe,Lon
     @Query("SELECT new com.SoftTech.SelfParkingLot_RestApi.dto.PaymentRecipeDetailDTO(p.id,p.tag,p.hours2,p.hours4,p.hours6,p.hours10,p.hours24) FROM " +
             "PaymentRecipe p WHERE p.parkingLotId = :parkingLotId AND p.enable = true")
     PaymentRecipeDetailDTO getPaymentRecipeDetailDTO(Long parkingLotId);
+
+    @Query("SELECT p.parkingLotId FROM PaymentRecipe p WHERE p.id=:id")
+    Long getParkingLotId(Long id);
 }

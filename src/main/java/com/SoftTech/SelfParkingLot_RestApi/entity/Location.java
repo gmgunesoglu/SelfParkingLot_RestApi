@@ -61,7 +61,7 @@ public class Location {
     private boolean enable;
 
     //cascade yok!
-    @OneToMany(targetEntity = ParkingLot.class)
+    @OneToMany(targetEntity = ParkingLot.class, cascade = {}, fetch =  FetchType.LAZY)
     @JoinColumn(name="location_id",referencedColumnName = "id")
     private List<ParkingLot> parkingLots;
 }

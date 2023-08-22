@@ -1,11 +1,7 @@
 package com.SoftTech.SelfParkingLot_RestApi.security;
 
-import com.SoftTech.SelfParkingLot_RestApi.exceptionhandling.GlobalRuntimeException;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import java.util.*;
 
 @Data
@@ -51,7 +47,7 @@ public class CurrentTokens {
         hashMap.remove(userName);
         //killAnyNodeFromQueue(userName);
         System.out.println("[!] kullanıcı çıkış yaptı: "+userName);
-        return "Çıkış başarılı.";
+        return "Logout success";
     }
 
     public HashMap<String, String> getTokens() {

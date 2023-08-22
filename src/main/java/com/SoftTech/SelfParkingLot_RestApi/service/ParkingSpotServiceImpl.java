@@ -6,6 +6,7 @@ import com.SoftTech.SelfParkingLot_RestApi.entity.ParkingSpot;
 import com.SoftTech.SelfParkingLot_RestApi.exceptionhandling.GlobalRuntimeException;
 import com.SoftTech.SelfParkingLot_RestApi.repository.ParkingLotRepository;
 import com.SoftTech.SelfParkingLot_RestApi.repository.ParkingSpotRepository;
+import com.SoftTech.SelfParkingLot_RestApi.repository.PaymentRecipeRepository;
 import com.SoftTech.SelfParkingLot_RestApi.repository.SharedParkingLotRepository;
 import com.SoftTech.SelfParkingLot_RestApi.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ public class ParkingSpotServiceImpl implements ParkingSpotService{
     private final ParkingSpotRepository parkingSpotRepository;
     private final ParkingLotRepository parkingLotRepository;
     private final SharedParkingLotRepository sharedParkingLotRepository;
+    private final PaymentRecipeRepository paymentRecipeRepository;
     private final JwtService jwtService;
 
 
@@ -94,6 +96,11 @@ public class ParkingSpotServiceImpl implements ParkingSpotService{
             }
         }
 
+        // girilen ödeme tarifesi o otoparka mı ait?
+        if(!paymentRecipeRepository.getParkingLotId(dto.getPaymentRecipeId()).equals(dto.getParkingLotId())){
+            throw new GlobalRuntimeException("This payment recipe is not belong to this parking lot! ",HttpStatus.BAD_REQUEST);
+        }
+
         // vehicleTypeCode oluştur
         int code=0;
         if(dto.isMOTORCYCLE()){
@@ -124,6 +131,7 @@ public class ParkingSpotServiceImpl implements ParkingSpotService{
         parkingSpot.setPaymentRecipeId(dto.getPaymentRecipeId());
         parkingSpot.setVehicleTypeCode(code);
         parkingSpot.setIndoor(dto.isIndoor());
+        parkingSpot.setOccupied(false);
         parkingSpot.setEnable(true);
         parkingSpotRepository.save(parkingSpot);
 
@@ -201,14 +209,56 @@ public class ParkingSpotServiceImpl implements ParkingSpotService{
             // owner değil...
             if(sharedParkingLotRepository.checkWithPartnerIdAndParkingLotId(userId,parkingLot.getId())==null){
                 //parnter da değil...
-                throw new GlobalRuntimeException("You can't update other users parking spot! ", HttpStatus.UNAUTHORIZED);
+                throw new GlobalRuntimeException("You can't remove other users parking spot! ", HttpStatus.UNAUTHORIZED);
             }
+        }
+
+        // şuan kullanımda mı?
+        if(parkingSpot.isOccupied()){
+            throw new GlobalRuntimeException("You can't remove parking spot when it occupied! ", HttpStatus.UNAUTHORIZED);
         }
 
         // disable et
         parkingSpot.setEnable(false);
         parkingSpotRepository.save(parkingSpot);
         return "Parking spot removed!";
+    }
+
+    @Override
+    public ParkingLotWithTListDTO<ParkingSpotDetailDTO> findParkingSpots(Long parkingLotId) {
+
+        // parkingLotId yi kontrol et varmı
+        if(parkingLotRepository.getParkingLotByIdAndEnable(parkingLotId,true)==null){
+            throw new GlobalRuntimeException("Parking lot not found! ",HttpStatus.NOT_FOUND);
+        }
+
+        // parking lot bilgilerini yükle
+        ParkingLotWithTListDTO parkingLotWithTListDTO = parkingLotRepository.getParkingLotWithTListDTO(parkingLotId);
+
+        // spotları liste olarak çek
+        List<ParkingSpotDetailDTO> dtos = parkingSpotRepository.getAllParkingSpotDetailDTO(parkingLotId);
+
+        // hangi araçların girebileceğini string list e çevir
+        int code;
+        for(var dto : dtos){
+            code = parkingSpotRepository.getVehicleType(dto.getId());
+            dto.setCanPark(new ArrayList<>());
+            if((code&1)==1){
+                dto.canPark("MOTORCYCLE");
+            }if((code&2)==2){
+                dto.canPark("CAR");
+            }if((code&4)==4){
+                dto.canPark("MINIBUS");
+            }if((code&8)==8){
+                dto.canPark("BUS");
+            }if((code&16)==16){
+                dto.canPark("TRUCK");
+            }
+        }
+
+        // verileri birleştir göder
+        parkingLotWithTListDTO.setTList(dtos);
+        return parkingLotWithTListDTO;
     }
 
     private Long getOwnerIdFromRequest(HttpServletRequest request){
