@@ -87,7 +87,7 @@ public class AccountServiceImpl implements AccountService{
                 // Hatta broda ip blocklamak gerekir. Tüm bu işlemler kötü niyetli kullanıcılara karşı sunucuyu savunma cabaları.
                 // ama kesin bir koruma yok, sadece yavaşlatma var. İp blocklama ile sunucu performansı çok iyi bir sekilde korunabilir
 
-                throw new GlobalRuntimeException("This user is blocked for 24 Hours: "+person.getUsername(), HttpStatus.NOT_FOUND);
+                throw new GlobalRuntimeException("This user is blocked for 24 Hours: "+person.getUsername(), HttpStatus.LOCKED);
             }
         }
         String token=jwtService.generateToken(person);
@@ -96,7 +96,7 @@ public class AccountServiceImpl implements AccountService{
         }catch (AuthenticationException ex){
             person.setBlockTime(new Date(System.currentTimeMillis()));
             personRepository.save(person);
-            throw ex;
+            throw new GlobalRuntimeException("Multi login try, can't login for 1 hours!",HttpStatus.TOO_MANY_REQUESTS);
         }
         return new JwtToken(token);
     }
@@ -130,27 +130,42 @@ public class AccountServiceImpl implements AccountService{
             return "Password changed, you can login now.";
         }else{
             // şifre yanlış
-            return "Password is incorrect!";
+            throw new GlobalRuntimeException("Password is incorrect! ",HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
     public Person personUpdate(PersonUpdateDTO dto, HttpServletRequest request) {
-        Person person = personRepository.getPersonByEmail(dto.getEmail());
-        if(person!=null){
-            // email kullanılıyor.
-            person = getPersonFromRequest(request);
-            if(!person.getEmail().equals(dto.getEmail())){
-                throw new UsernameNotFoundException("Email is already uses! "+dto.getEmail());
+        Person person;
+        if(dto.getEmail()!=null && !dto.getEmail().equals("")){
+            person = personRepository.getPersonByEmail(dto.getEmail());
+            if(person!=null){
+                // email kullanılıyor
+                person = getPersonFromRequest(request);
+                if(!person.getEmail().equals(dto.getEmail())){
+                    // ve kendisinin değil
+                    throw new GlobalRuntimeException("Email is already uses! "+dto.getEmail(),HttpStatus.BAD_REQUEST);
+                }
+            }else{
+                // email null değil ve birisine de ait değil
+                person = getPersonFromRequest(request);
+                person.setEmail(dto.getEmail());
             }
         }else{
             person = getPersonFromRequest(request);
         }
-        person.setEmail(dto.getEmail());
-        person.setFirstName(dto.getFirstName());
-        person.setLastName(dto.getLastName());
-        person.setPhoneNumber(dto.getPhoneNumber());
-        person.setSecretKey(dto.getSecretKey());
+        if(dto.getFirstName()!=null && !dto.getFirstName().equals("")){
+            person.setFirstName(dto.getFirstName());
+        }
+        if(dto.getLastName()!=null && !dto.getLastName().equals("")){
+            person.setLastName(dto.getLastName());
+        }
+        if(dto.getPhoneNumber()!=null && !dto.getPhoneNumber().equals("")){
+            person.setPhoneNumber(dto.getPhoneNumber());
+        }
+        if(dto.getSecretKey()!=null && !dto.getSecretKey().equals("")){
+            person.setSecretKey(dto.getSecretKey());
+        }
         return personRepository.save(person);
     }
 
@@ -158,12 +173,12 @@ public class AccountServiceImpl implements AccountService{
     public String disable(HttpServletRequest request, PersonLoginDTO dto) {
         //kullanıcıyı çek
         Person person = getPersonFromRequest(request);
-        if(!person.getUsername().equals(dto.getUsernameOrEmail())&&person.getEmail().equals(dto.getUsernameOrEmail())){
+        if(!person.getUsername().equals(dto.getUsernameOrEmail()) && !person.getEmail().equals(dto.getUsernameOrEmail())){
             // username/email yanlış ise...
-            new UsernameNotFoundException("Username or Password is not corrected");
+            throw new GlobalRuntimeException("Username or Password is not corrected",HttpStatus.NOT_ACCEPTABLE);
         }
         if(!passwordEncoder.matches(dto.getPassword(),person.getPassword())){
-            return "Username or Password is not corrected";
+            throw new GlobalRuntimeException("Username or Password is not corrected",HttpStatus.NOT_ACCEPTABLE);
         }
         person.setEnable(false);
         currentTokens.remove(person.getUsername());

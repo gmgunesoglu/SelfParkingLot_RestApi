@@ -3,6 +3,8 @@ package com.SoftTech.SelfParkingLot_RestApi.controller;
 import com.SoftTech.SelfParkingLot_RestApi.dto.*;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.service.AccountService;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class AccountController {
         return accountService.showPersonInfo(request);
     }
 
-    @PostMapping("register")
+    @PostMapping("/register")
     public Person register(@RequestBody PersonDTO dto){
         return accountService.register(dto);
     }

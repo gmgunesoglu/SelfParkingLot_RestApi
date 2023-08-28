@@ -7,14 +7,9 @@ import com.SoftTech.SelfParkingLot_RestApi.exceptionhandling.GlobalRuntimeExcept
 import com.SoftTech.SelfParkingLot_RestApi.repository.LocationRepository;
 import com.SoftTech.SelfParkingLot_RestApi.repository.ParkingLotRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.tool.schema.spi.SqlScriptException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.sql.SQLData;
-import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +50,9 @@ public class LocationServiceImpl implements LocationService{
         location.setEnable(true);
 
         try{
-            return locationRepository.save(location);
+            Location location2 = locationRepository.save(location);
+            System.out.println("test");
+            return location;
         }catch (DataIntegrityViolationException e){
             // aynı il/ilçe/mahalle veri var ise...
             Location oldLocation = locationRepository.getLocationsByCityAndTownAndDistrict(dto.getCity().toUpperCase(),dto.getTown().toUpperCase(),dto.getDistrict().toUpperCase());

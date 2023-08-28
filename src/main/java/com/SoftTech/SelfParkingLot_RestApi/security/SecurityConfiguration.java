@@ -25,13 +25,10 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/user/**").hasAnyAuthority("USER","ADMIN")
-                .requestMatchers("/customer/**").hasAnyAuthority("CUSTOMER","USER","ADMIN")
                 .requestMatchers("/account/register","/account/login").permitAll()
-
-
-
+//                .requestMatchers("/customer/**","/account/**").hasAnyAuthority("CUSTOMER","USER","ADMIN")
+                .requestMatchers("/user/**").hasAnyAuthority("USER","ADMIN")
+                .requestMatchers("admin/**").hasAuthority("ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()

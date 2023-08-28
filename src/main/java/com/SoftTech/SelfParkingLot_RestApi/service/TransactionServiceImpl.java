@@ -12,13 +12,10 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Token;
-import com.sun.security.auth.module.LdapLoginModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,8 +65,6 @@ public class TransactionServiceImpl implements TransactionService{
         transactionRepository.save(transaction);
         parkingSpot.setOccupied(true);
         parkingSpotRepository.save(parkingSpot);
-
-
 
         // info gönder
         CheckInInfoDTO info = new CheckInInfoDTO();

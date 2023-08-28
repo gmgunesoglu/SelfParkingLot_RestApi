@@ -22,4 +22,6 @@ public interface PersonRepository extends JpaRepository<Person,Long> {
     Boolean checkWithUsernameOrEmail(String username, String email);
 
     Person getPersonByEmail(String email);
+
+    Person getPersonByUsernameOrEmail(String username, String email);
 }

@@ -1,26 +1,10 @@
 package com.SoftTech.SelfParkingLot_RestApi.service;
 
-import com.SoftTech.SelfParkingLot_RestApi.dto.AuthenticationResponseDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.JwtToken;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonDTO;
-import com.SoftTech.SelfParkingLot_RestApi.dto.PersonLoginDTO;
-import com.SoftTech.SelfParkingLot_RestApi.entity.Authority;
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
 import com.SoftTech.SelfParkingLot_RestApi.repository.PersonRepository;
-import com.SoftTech.SelfParkingLot_RestApi.security.JwtService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.apache.bcel.classfile.Module;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
