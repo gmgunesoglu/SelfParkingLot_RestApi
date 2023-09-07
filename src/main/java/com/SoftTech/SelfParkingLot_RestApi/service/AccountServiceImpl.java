@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,15 +29,18 @@ public class AccountServiceImpl implements AccountService{
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    private final UserDetailsService userDetailsService;
     private CurrentTokens currentTokens;
 
     @Autowired
-    public AccountServiceImpl(PersonRepository personRepository, JWTAuthenticationFilter filter, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public AccountServiceImpl(PersonRepository personRepository, JWTAuthenticationFilter filter, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         currentTokens=filter.getCurrentTokens();
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -92,7 +97,8 @@ public class AccountServiceImpl implements AccountService{
         }
         String token=jwtService.generateToken(person);
         try{
-            currentTokens.addToCache(token,person.getUsername());
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(dto.getUsernameOrEmail());
+            currentTokens.addToCache(token,person.getUsername(),userDetails);
         }catch (AuthenticationException ex){
             person.setBlockTime(new Date(System.currentTimeMillis()));
             personRepository.save(person);
@@ -102,8 +108,8 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public HashMap<String, String> getTokens() {
-        return currentTokens.getTokens();
+    public HashMap<String, UserAuthorityDto> getTokens() {
+        return currentTokens.getUserMap();
     }
 
     @Override
@@ -114,7 +120,6 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public String logout(HttpServletRequest request) {
         Person person = getPersonFromRequest(request);
-
         return currentTokens.remove(person.getUsername());
     }
 

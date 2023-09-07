@@ -1,17 +1,21 @@
 package com.SoftTech.SelfParkingLot_RestApi.security;
 
+import com.SoftTech.SelfParkingLot_RestApi.dto.UserAuthorityDto;
 import lombok.Data;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.*;
 
 @Data
 public class CurrentTokens {
     private TokenQueue queue=new TokenQueue();  //çift yönlü dairesel sıra
-    private HashMap<String,String> hashMap = new HashMap<>();
+    private HashMap<String, UserAuthorityDto> userMap = new HashMap<>();
     private HashMap<String,Integer> multiLogins = new HashMap<>();
     private Timer timer = new Timer();  // farklı bir thread için...
     private int tokenDuration;
-    private final int tryLoginLimit = 3;  // token duration icerisinde 100 kere denerse blocklansın
+    private final int tryLoginLimit = 3;  // token duration icerisinde 3 kere denerse blocklansın
 
     private TimerTask task = new TimerTask() {
         @Override
@@ -27,31 +31,31 @@ public class CurrentTokens {
 
     }
 
-    public void addToCache(String token,String userName){
-        if(hashMap.containsKey(userName)){
+    public void addToCache(String token, String userName, UserDetails userDetails){
+        if(userMap.containsKey(userName)){
             if(countSessions(userName)==tryLoginLimit){
                 //kötü niyetli bir kullanıcı için...
                 //limite ulaştı ise veri tabanında blockla hashmapden sil
                 multiLogins.remove(userName);
-                hashMap.remove(userName);
+                userMap.remove(userName);
                 System.out.println("[!] Kullanıcı blocklandı: "+userName);
                 throw new AuthenticationException("Suspicious move. You cannot login for 24 hours.") {
                 };
             }
         }
         addToQueue(token,userName);
-        hashMap.put(userName,token);
+        userMap.put(userName,new UserAuthorityDto(token,userDetails));
     }
 
     public String remove(String userName){
-        hashMap.remove(userName);
+        userMap.remove(userName);
         //killAnyNodeFromQueue(userName);
         System.out.println("[!] kullanıcı çıkış yaptı: "+userName);
         return "Logout success";
     }
 
-    public HashMap<String, String> getTokens() {
-        return hashMap;
+    public HashMap<String, UserAuthorityDto> getUserMap() {
+        return userMap;
     }
 
     private void addToQueue(String token,String userName){
@@ -104,7 +108,7 @@ public class CurrentTokens {
         if(queue.getInitialDate()!=null && queue.getInitialDate().before(killTime)){
             //kuyrugun basını kontrol et burdan silinen olursa hashmap den de sil
             System.out.println("[!] Silinen token: "+queue.getData());
-            hashMap.remove(queue.getUserName(),queue.getData());
+            userMap.remove(queue.getUserName(),queue.getData());
             //multi login yaptı ise sayısını 1 düşür
             if(multiLogins.containsKey(queue.getUserName())){
                 int count = multiLogins.get(queue.getUserName());
@@ -136,10 +140,19 @@ public class CurrentTokens {
     }
 
     public String  getTokenOfUser(String username){
-        if(hashMap.containsKey(username)){
-            return hashMap.get(username);
+        if(userMap.containsKey(username)){
+            UserAuthorityDto dto = userMap.get(username);
+            return dto.getJwt();
         }
         return "";
+    }
+
+    public UsernamePasswordAuthenticationToken getAuthOfUser(String username){
+        if(userMap.containsKey(username)){
+            UserAuthorityDto dto = userMap.get(username);
+            return dto.getAuth();
+        }
+        return null;
     }
 
     private int countSessions(String userName){

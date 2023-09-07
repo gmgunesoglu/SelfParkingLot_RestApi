@@ -13,7 +13,7 @@ public interface AccountService {
 
     JwtToken login(PersonLoginDTO dto);
 
-    HashMap<String, String> getTokens();
+    HashMap<String, UserAuthorityDto> getTokens();
 
     List<String> listQueue();
 

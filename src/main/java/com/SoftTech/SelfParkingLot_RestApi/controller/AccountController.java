@@ -57,7 +57,7 @@ public class AccountController {
 
     //geçici
     @GetMapping("/tokens")
-    public HashMap<String, String> getTokens(){
+    public HashMap<String, UserAuthorityDto> getTokens(){
         return accountService.getTokens();
     }
 

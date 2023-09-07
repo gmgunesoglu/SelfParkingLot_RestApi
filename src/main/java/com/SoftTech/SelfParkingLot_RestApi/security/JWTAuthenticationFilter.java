@@ -1,6 +1,7 @@
 package com.SoftTech.SelfParkingLot_RestApi.security;
 
 import com.SoftTech.SelfParkingLot_RestApi.entity.Person;
+import com.SoftTech.SelfParkingLot_RestApi.exceptionhandling.GlobalRuntimeException;
 import com.SoftTech.SelfParkingLot_RestApi.repository.PersonRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,24 +51,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         jwtToken = authHeader.substring(7);
         userName = jwtService.extractUsername(jwtToken);
         if(!currentTokens.getTokenOfUser(userName).equals(jwtToken)){
-            //burada ne yapmalıyım?
-
-            throw new UsernameNotFoundException("Oturum sonlandırılmış! Tekrar login olun. ");
-        }
-        if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            //yetkilendirilmemiş ise check edip yetkilendirmek gerekir...
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
-            if(jwtService.isTokenValid(jwtToken,userDetails)){
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
+            // token ram de yok ise...
+            throw new UsernameNotFoundException("Invalid session! Login again!");
+        }else{
+            var auth = currentTokens.getAuthOfUser(userName);
+            auth.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(request,response);
     }
